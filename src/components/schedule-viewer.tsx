@@ -33,7 +33,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BookOpen,
   Building2,
@@ -43,6 +42,14 @@ import {
   MapPin,
   UserRound,
 } from "lucide-react";
+
+type ViewId = "today" | "day" | "week";
+
+const VIEW_TABS: { id: ViewId; label: string }[] = [
+  { id: "today", label: "Сегодня" },
+  { id: "day", label: "По дням" },
+  { id: "week", label: "Неделя" },
+];
 
 function typeLabel(type: Lesson["type"]): string {
   const map = {
@@ -137,6 +144,7 @@ export function ScheduleViewer() {
   const sunday = isSunday(today);
 
   const [week, setWeek] = useState<"odd" | "even">(autoWeek);
+  const [view, setView] = useState<ViewId>("today");
   const [selectedDay, setSelectedDay] = useState<DayId>(
     sunday ? "monday" : todayDay,
   );
@@ -192,7 +200,7 @@ export function ScheduleViewer() {
         </Card>
       </header>
 
-      <section className="sticky top-0 z-20 -mx-4 border-b bg-background/95 px-4 py-3 backdrop-blur supports-backdrop-filter:bg-background/80 sm:-mx-0 sm:rounded-xl sm:border sm:px-4">
+      <section className="sticky top-0 z-20 -mx-4 space-y-3 border-b bg-background/95 px-4 py-3 backdrop-blur supports-backdrop-filter:bg-background/80 sm:-mx-0 sm:rounded-xl sm:border sm:px-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-medium">Тип недели</p>
@@ -228,84 +236,125 @@ export function ScheduleViewer() {
             </Button>
           </div>
         </div>
-      </section>
-
-      <Tabs defaultValue="today" className="gap-4">
-        <TabsList className="grid h-auto w-full grid-cols-3">
-          <TabsTrigger value="today">Сегодня</TabsTrigger>
-          <TabsTrigger value="day">По дням</TabsTrigger>
-          <TabsTrigger value="week">Неделя</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="today" className="space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold">Пары на сегодня</h2>
-            <Badge variant="outline">{weekLabel(week)}</Badge>
-          </div>
-          {sunday ? (
-            <EmptyState text="Воскресенье — выходной. Выберите день во вкладке «По дням» или смотрите всю неделю." />
-          ) : todayLessons.length === 0 ? (
-            <EmptyState text="На сегодня при выбранной неделе пар нет." />
-          ) : (
-            <div className="grid gap-3">
-              {todayLessons.map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="day" className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {DAY_ORDER.map((day) => (
-              <Button
-                key={day}
-                size="sm"
-                variant={selectedDay === day ? "default" : "outline"}
-                onClick={() => setSelectedDay(day)}
-              >
-                {DAY_LABELS[day]}
-              </Button>
-            ))}
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold">{DAY_LABELS[selectedDay]}</h2>
-            <Badge variant="outline">{weekShort(week)}</Badge>
-          </div>
-          {dayLessons.length === 0 ? (
-            <EmptyState text="В этот день при выбранной неделе пар нет." />
-          ) : (
-            <div className="grid gap-3">
-              {dayLessons.map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="week" className="space-y-6">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold">Неделя целиком</h2>
-            <Badge variant="outline">{weekLabel(week)}</Badge>
-          </div>
-          {DAY_ORDER.map((day) => {
-            const lessons = weekLessons.filter((l) => l.day === day);
-            if (lessons.length === 0) return null;
+        <div
+          className="grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1"
+          role="tablist"
+          aria-label="Вид расписания"
+        >
+          {VIEW_TABS.map((tab) => {
+            const selected = view === tab.id;
             return (
-              <div key={day} className="space-y-3">
-                <h3 className="text-base font-semibold text-foreground/90">
-                  {DAY_LABELS[day]}
-                </h3>
-                <div className="grid gap-3">
-                  {lessons.map((lesson) => (
-                    <LessonCard key={lesson.id} lesson={lesson} />
-                  ))}
-                </div>
-              </div>
+              <Button
+                key={tab.id}
+                type="button"
+                role="tab"
+                id={`view-tab-${tab.id}`}
+                aria-selected={selected}
+                aria-controls={`view-panel-${tab.id}`}
+                variant={selected ? "default" : "ghost"}
+                className="h-9 min-h-9 px-2 text-sm sm:px-3"
+                onClick={() => setView(tab.id)}
+              >
+                {tab.label}
+              </Button>
             );
           })}
-        </TabsContent>
-      </Tabs>
+        </div>
+      </section>
+
+      <div className="flex flex-col gap-4">
+        {view === "today" && (
+          <div
+            id="view-panel-today"
+            role="tabpanel"
+            aria-labelledby="view-tab-today"
+            className="space-y-3"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-lg font-semibold">Пары на сегодня</h2>
+              <Badge variant="outline">{weekLabel(week)}</Badge>
+            </div>
+            {sunday ? (
+              <EmptyState text="Воскресенье — выходной. Выберите день во вкладке «По дням» или смотрите всю неделю." />
+            ) : todayLessons.length === 0 ? (
+              <EmptyState text="На сегодня при выбранной неделе пар нет." />
+            ) : (
+              <div className="grid gap-3">
+                {todayLessons.map((lesson) => (
+                  <LessonCard key={lesson.id} lesson={lesson} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {view === "day" && (
+          <div
+            id="view-panel-day"
+            role="tabpanel"
+            aria-labelledby="view-tab-day"
+            className="space-y-4"
+          >
+            <div className="flex flex-wrap gap-2">
+              {DAY_ORDER.map((day) => (
+                <Button
+                  key={day}
+                  type="button"
+                  size="sm"
+                  variant={selectedDay === day ? "default" : "outline"}
+                  aria-pressed={selectedDay === day}
+                  onClick={() => setSelectedDay(day)}
+                >
+                  {DAY_LABELS[day]}
+                </Button>
+              ))}
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-lg font-semibold">{DAY_LABELS[selectedDay]}</h2>
+              <Badge variant="outline">{weekShort(week)}</Badge>
+            </div>
+            {dayLessons.length === 0 ? (
+              <EmptyState text="В этот день при выбранной неделе пар нет." />
+            ) : (
+              <div className="grid gap-3">
+                {dayLessons.map((lesson) => (
+                  <LessonCard key={lesson.id} lesson={lesson} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {view === "week" && (
+          <div
+            id="view-panel-week"
+            role="tabpanel"
+            aria-labelledby="view-tab-week"
+            className="space-y-6"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-lg font-semibold">Неделя целиком</h2>
+              <Badge variant="outline">{weekLabel(week)}</Badge>
+            </div>
+            {DAY_ORDER.map((day) => {
+              const lessons = weekLessons.filter((l) => l.day === day);
+              if (lessons.length === 0) return null;
+              return (
+                <div key={day} className="space-y-3">
+                  <h3 className="text-base font-semibold text-foreground/90">
+                    {DAY_LABELS[day]}
+                  </h3>
+                  <div className="grid gap-3">
+                    {lessons.map((lesson) => (
+                      <LessonCard key={lesson.id} lesson={lesson} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       <Separator />
 
