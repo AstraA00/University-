@@ -205,9 +205,9 @@ export function ScheduleViewer() {
             </p>
           </div>
           <ToggleGroup
-            type="single"
-            value={week}
-            onValueChange={(v) => {
+            value={[week]}
+            onValueChange={(next) => {
+              const v = next[0];
               if (v === "odd" || v === "even") setWeek(v);
             }}
             variant="outline"
