@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   BookOpen,
   Building2,
@@ -204,22 +203,30 @@ export function ScheduleViewer() {
               </span>
             </p>
           </div>
-          <ToggleGroup
-            value={[week]}
-            onValueChange={(next) => {
-              const v = next[0];
-              if (v === "odd" || v === "even") setWeek(v);
-            }}
-            variant="outline"
-            className="w-full sm:w-auto"
+          <div
+            className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto"
+            role="group"
+            aria-label="Тип недели"
           >
-            <ToggleGroupItem value="odd" className="flex-1 px-4 sm:flex-none">
+            <Button
+              type="button"
+              variant={week === "odd" ? "default" : "outline"}
+              className="sm:px-4"
+              aria-pressed={week === "odd"}
+              onClick={() => setWeek("odd")}
+            >
               Нечётная · числитель
-            </ToggleGroupItem>
-            <ToggleGroupItem value="even" className="flex-1 px-4 sm:flex-none">
+            </Button>
+            <Button
+              type="button"
+              variant={week === "even" ? "default" : "outline"}
+              className="sm:px-4"
+              aria-pressed={week === "even"}
+              onClick={() => setWeek("even")}
+            >
               Чётная · знаменатель
-            </ToggleGroupItem>
-          </ToggleGroup>
+            </Button>
+          </div>
         </div>
       </section>
 
