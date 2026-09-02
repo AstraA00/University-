@@ -6,7 +6,15 @@
 
 У **26ИСТ2 есть разделение на нечётную и чётную недели** (числитель / знаменатель). Занятия с **1 сентября** начинаются по **нечётной неделе**.
 
-## Как запустить
+## Сайт
+
+Живое расписание: [https://astraa00.github.io/University-/](https://astraa00.github.io/University-/)
+
+GitHub Pages отдаёт только статику. Next.js нужно собирать с `output: 'export'` и `basePath: '/University-'` (у имени репозитория есть дефис в конце). Иначе Pages показывает README вместо приложения.
+
+После пуша в `main` GitHub Actions собирает `out/` и публикует сайт. В репозитории: **Settings → Pages → Source: GitHub Actions**.
+
+## Как запустить локально
 
 ```bash
 npm install
@@ -19,9 +27,11 @@ npm run dev -- -p 3456
 
 ```bash
 npm run build
-npm start -- -p 3456
+npm run preview:pages
 npm run lint
 ```
+
+`npm run build` делает статическую выгрузку в `out/` с путями `/University-/`. `npm run preview:pages` поднимает локальный просмотр этой выгрузки.
 
 ## Что умеет приложение
 
