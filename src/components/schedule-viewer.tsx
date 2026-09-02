@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
-  BookOpen,
   Building2,
   CalendarDays,
   Clock3,
@@ -178,26 +177,8 @@ export function ScheduleViewer() {
           <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             {SEMESTER}. Занятия с 1 сентября идут по{" "}
             <strong className="text-foreground">нечётной неделе (числитель)</strong>.
-            У группы есть пары, которые меняются каждую неделю, и пары, которые
-            стоят постоянно.
           </p>
         </div>
-
-        <Card className="border-sky-200 bg-sky-50/70 dark:border-sky-900 dark:bg-sky-950/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <BookOpen className="size-5" />
-              Да, есть числитель / знаменатель
-            </CardTitle>
-            <CardDescription className="text-sm leading-relaxed text-foreground/80">
-              В PDF у каждой пары две строки времени. Одна дисциплина на обе
-              строки — каждая неделя. Две разные дисциплины (или разная аудитория)
-              сверху и снизу — нечётная сверху, чётная снизу. Немецкий и
-              французский в понедельник вечером — языковые подгруппы, а не тип
-              недели. Субботние лаборатории ФОИТ — по конкретным датам.
-            </CardDescription>
-          </CardHeader>
-        </Card>
       </header>
 
       <section className="sticky top-0 z-20 -mx-4 space-y-3 border-b bg-background/95 px-4 py-3 backdrop-blur supports-backdrop-filter:bg-background/80 sm:-mx-0 sm:rounded-xl sm:border sm:px-4">
